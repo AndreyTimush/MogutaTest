@@ -15,20 +15,19 @@
         <button type='submit'>Искать</button>
     </form>
     <?php
+    require 'Database.php';
+
     if (!empty($_GET)) {
         $email = $_GET['email'];
 
-        $mysqli = new mysqli("localhost", "user", "password", "dbname");
+        $database = new Database("localhost", "user", "password", "dbname");
 
         $sql = "SELECT user.id, user_info.name, user_info.sname 
                 FROM user
                 JOIN user_info ON user.id = user_info.user_id 
                 WHERE user.email = ?";
 
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $database->query($sql, [$email]);
 
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
@@ -38,8 +37,7 @@
             echo "<p class='notFound'>Записей для email $email не обнаружено!</p>";
         }
 
-        $stmt->close();
-        $mysqli->close();
+        $database->close();
     }
     ?>
 </body>
